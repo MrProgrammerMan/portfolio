@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: ${{ inputs.environment }}
+    env:
+      HOSTNAME: ${{ inputs.environment }}
 
     steps:
       - uses: actions/checkout@v6
@@ -30,8 +32,6 @@ jobs:
           ssh-keyscan -H ${{ secrets.IP_ADDRESS }} >> ~/.ssh/known_hosts
       
       - name: Create host config from bootstrap template
-        env:
-          HOSTNAME: ${{ vars.HOSTNAME }}
         run: |
           mkdir -p modules/hosts/$HOSTNAME
 
@@ -61,14 +61,11 @@ jobs:
           git add .
       
       - name: Run nixos-anywhere
-        env:
-          HOSTNAME: ${{ vars.HOSTNAME }}
-          IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
         run: |
           nix run github:nix-community/nixos-anywhere \
             -- --generate-hardware-config nixos-generate-config ./modules/hosts/$HOSTNAME/_hardware-configuration.nix \
             --flake .#$HOSTNAME \
-            --target-host root@$IP_ADDRESS \
+            --target-host root@${{ secrets.IP_ADDRESS }} \
             -i ~/.ssh/ed25519
 
       - name: Commit hardware configuration
@@ -76,7 +73,6 @@ jobs:
         run: |
           git add .
           git commit -m "actions($HOSTNAME): Add hardware configuration for $HOSTNAME"
-          git push
 
       - name: Push changes
         if: ${{ !env.ACT }}
