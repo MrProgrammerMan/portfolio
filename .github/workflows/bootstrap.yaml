@@ -1,0 +1,82 @@
+name: Bootstrap host
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@v6
+    
+      - name: Set up Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_ROOT_KEY }}" > ~/.ssh/ed25519
+          chmod 600 ~/.ssh/ed25519
+          ssh-keyscan -H ${{ secrets.IP_ADDRESS }} >> ~/.ssh/known_hosts
+      
+      - name: Create host config from bootstrap template
+        env:
+          HOSTNAME: ${{ vars.HOSTNAME }}
+        run: |
+          mkdir -p modules/hosts/$HOSTNAME
+
+          sed -e '/^[[:space:]]*#/d' \
+            -e "s/bootstrapConfig/$HOSTNAME/" \
+            modules/hosts/bootstrap/configuration.nix > modules/hosts/$HOSTNAME/configuration.nix
+
+          sed -e '/^[[:space:]]*#/d' \
+            -e "s/bootstrapConfig/$HOSTNAME/" \
+            modules/nixosModules/bootstrap-specific.nix > modules/nixosModules/$HOSTNAME-specific.nix
+
+      - name: Configure git
+        if: ${{ !env.ACT }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Commit host config
+        if: ${{ !env.ACT }}
+        run: |
+          git add .
+          git commit -m "actions($HOSTNAME): Add configuration for $HOSTNAME"
+
+      - name: Track config for act tests(flake doesn't work with untracked files)
+        if: ${{ env.ACT }}
+        run: |
+          git add .
+      
+      - name: Run nixos-anywhere
+        env:
+          HOSTNAME: ${{ vars.HOSTNAME }}
+          IP_ADDRESS: ${{ secrets.IP_ADDRESS }}
+        run: |
+          nix run github:nix-community/nixos-anywhere \
+            -- --generate-hardware-config nixos-generate-config ./modules/hosts/$HOSTNAME/_hardware-configuration.nix \
+            --flake .#$HOSTNAME \
+            --target-host root@$IP_ADDRESS \
+            -i ~/.ssh/ed25519
+
+      - name: Commit hardware configuration
+        if: ${{ !env.ACT }}
+        run: |
+          git add .
+          git commit -m "actions($HOSTNAME): Add hardware configuration for $HOSTNAME"
+          git push
+
+      - name: Push changes
+        if: ${{ !env.ACT }}
+        run: |
+          git push
