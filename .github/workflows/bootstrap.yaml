@@ -77,6 +77,8 @@ jobs:
       - name: Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        permissions:
+          contents: write
         if: ${{ !env.ACT }}
         run: |
           git push
