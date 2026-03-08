@@ -106,8 +106,21 @@ jobs:
       - name: Encrypt secrets with agenix
         if: ${{ !env.ACT }}
         run: |
+          set -euo pipefail
           cd secrets
-          envsubst < ../.env.template | nix run github:ryantm/agenix -- -e .env.age -i ~/.ssh/ed25519
+          nix shell nixpkgs#gettext --command \
+            sh -c 'envsubst < ../.env.template | nix run github:ryantm/agenix -- -e .env.age -i ~/.ssh/ed25519'
+
+          if [[ ! -s .env.age ]]; then
+            echo "ERROR: .env.age was not created or is empty" && exit 1
+          fi
+          echo "Successfully created .env.age ($(wc -c < .env.age) bytes)"
+
+      - name: Commit encrypted secrets
+        if: ${{ !env.ACT }}
+        run: |
+          git add .
+          git commit -m "actions($TARGET_HOST): Add encrypted secrets for $TARGET_HOST"
       
       - name: Swap bootstrapped host to common config
         if: ${{ !env.ACT }}
