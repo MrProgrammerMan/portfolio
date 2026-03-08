@@ -87,7 +87,7 @@ jobs:
       - name: Add host ssh key to agenix keys
         if: ${{ !env.ACT }}
         run: |
-          NEW_KEY="$(ssh-keyscan -t ed25519 65.108.95.160 2>/dev/null \
+          NEW_KEY="$(ssh-keyscan -t ed25519 ${{ secrets.IP_ADDRESS }} 2>/dev/null \
             | grep 'ssh-ed25519' \
             | awk '{print $2, $3}' \
             | tr -d '\n') root@$TARGET_HOST"
@@ -109,9 +109,31 @@ jobs:
           cd secrets
           envsubst < ../.env.template | nix run github:nix-community/agenix -- -e .env.age -i ~/.ssh/ed25519
       
+      - name: Swap bootstrapped host to common config
+        if: ${{ !env.ACT }}
+        run: |
+          sed -i '/#/! s/\bbootstrap\b/common/' modules/hosts/$TARGET_HOST/configuration.nix
+        
+      - name: Commit config finalization
+        if: ${{ !env.ACT }}
+        run: |
+          git add .
+          git commit -m "actions($TARGET_HOST): Swap $TARGET_HOST config to common config"
+      
       - name: Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ !env.ACT }}
         run: |
           git push
+
+      - name: Rebuild host to finished config
+        if: ${{ !env.ACT }}
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.IP_ADDRESS }}
+          username: root
+          key: ${{ secrets.SSH_ROOT_KEY }}
+          port: 22
+          script: |
+            nixos-rebuild switch --flake github:${{ github.repository }}/${{ github.ref_name }}#$HOSTNAME
