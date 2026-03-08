@@ -1,7 +1,9 @@
-{ self, ... }: {
+{ self, inputs, ... }: {
   flake.nixosModules.common = { ... }: {
-    imports = [
-      self.nixosModules.bootstrap
+    imports = with self.nixosModules; [
+      bootstrap
+      secrets
+      inputs.agenix.nixosModules.default
     ];
   };
 }

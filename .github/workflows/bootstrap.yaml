@@ -77,9 +77,93 @@ jobs:
           git add .
           git commit -m "actions($TARGET_HOST): Add hardware configuration for $TARGET_HOST"
 
+      - name: Re-scan host SSH key after nixos-anywhere
+        run: |
+          ssh-keygen -R ${{ secrets.IP_ADDRESS }}
+          until ssh-keyscan -H ${{ secrets.IP_ADDRESS }} 2>/dev/null | grep -q 'ssh-ed25519'; do
+            echo "Waiting for sshd..."; sleep 5
+          done
+        
+      - name: Add host ssh key to agenix keys
+        if: ${{ !env.ACT }}
+        run: |
+          NEW_KEY="$(ssh-keyscan -t ed25519 ${{ secrets.IP_ADDRESS }} 2>/dev/null \
+            | grep 'ssh-ed25519' \
+            | awk '{print $2, $3}' \
+            | tr -d '\n') root@$TARGET_HOST"
+
+          if [[ -z "$NEW_KEY" ]]; then
+            echo "ERROR: Failed to fetch host key" && exit 1
+          fi
+          sed -i "s|^]|  \"${NEW_KEY}\"\n]|" ./secrets/keys.nix
+
+      - name: Commit agenix key changes
+        if: ${{ !env.ACT }}
+        run: |
+          git add .
+          git commit -m "actions($TARGET_HOST): Add $TARGET_HOST ssh key to agenix keys"
+
+      - name: Encrypt secrets with agenix
+        if: ${{ !env.ACT }}
+        env:
+          ALL_VARS: ${{ toJSON(vars) }}
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+        run: |
+          set -euo pipefail
+          cp .env.template .env.rendered
+
+          # Replace ${vars.KEY} from ALL_VARS
+          jq -r 'to_entries[] | "\(.key)\t\(.value)"' <<< "$ALL_VARS" | \
+          while IFS=$'\t' read -r k v; do
+            sed -i "s|\${vars\.${k}}|${v}|g" .env.rendered
+          done
+
+          # Replace ${secrets.KEY} from ALL_SECRETS
+          jq -r 'to_entries[] | "\(.key)\t\(.value)"' <<< "$ALL_SECRETS" | \
+          while IFS=$'\t' read -r k v; do
+            sed -i "s|\${secrets\.${k}}|${v}|g" .env.rendered
+          done
+
+          cd secrets
+          nix run github:ryantm/agenix -- -e .env.age -i ~/.ssh/ed25519 < ../.env.rendered
+          shred -u ../.env.rendered
+
+          if [[ ! -s .env.age ]]; then
+            echo "ERROR: .env.age was not created or is empty" && exit 1
+          fi
+          echo "Successfully created .env.age ($(wc -c < .env.age) bytes)"
+
+      - name: Commit encrypted secrets
+        if: ${{ !env.ACT }}
+        run: |
+          git add .
+          git commit -m "actions($TARGET_HOST): Add encrypted secrets for $TARGET_HOST"
+      
+      - name: Swap bootstrapped host to common config
+        if: ${{ !env.ACT }}
+        run: |
+          sed -i '/#/! s/\bbootstrap\b/common/' modules/hosts/$TARGET_HOST/configuration.nix
+        
+      - name: Commit config finalization
+        if: ${{ !env.ACT }}
+        run: |
+          git add .
+          git commit -m "actions($TARGET_HOST): Swap $TARGET_HOST config to common config"
+      
       - name: Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ !env.ACT }}
         run: |
           git push
+
+      - name: Rebuild host to finished config
+        if: ${{ !env.ACT }}
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.IP_ADDRESS }}
+          username: root
+          key: ${{ secrets.SSH_ROOT_KEY }}
+          port: 22
+          script: |
+            nixos-rebuild switch --flake github:${{ github.repository }}/${{ github.ref_name }}#$HOSTNAME

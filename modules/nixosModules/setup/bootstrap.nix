@@ -1,8 +1,9 @@
 { self, ... }: {
   flake.nixosModules.bootstrap = { modulesPath, lib, pkgs, ... }: {
-    imports = [
+    imports = with self.nixosModules; [
       (modulesPath + "/installer/scan/not-detected.nix")
-      self.nixosModules.ssh-root
+      ssh-root
+      app-user
     ];
     boot.loader.grub = {
       efiSupport = true;
