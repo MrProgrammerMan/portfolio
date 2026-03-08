@@ -22,6 +22,10 @@ A template for deploying [NixOS](https://nixos.org/) to a remote server using [n
 - [Disk Configuration](#disk-configuration)
 - [The `app` User](#the-app-user)
 - [Local Testing with `act`](#local-testing-with-act)
+- [Alternatives](#alternatives)
+  - [NixOS Deployment Tools](#nixos-deployment-tools)
+  - [Secret Management](#secret-management)
+  - [Comparison Table](#comparison-table)
 
 ## Who Is This For?
 
@@ -225,3 +229,78 @@ This user owns the decrypted `.env` file at `/run/agenix/.env`. Use this user to
 ## Local Testing with `act`
 
 The workflows include `if: ${{ !env.ACT }}` conditionals to skip git operations and secret encryption when running locally with [act](https://github.com/nektos/act). This allows you to test the nixos-anywhere provisioning step without triggering commits or secret management.
+
+## Alternatives
+
+Several tools in the NixOS ecosystem address deployment and secret management. Below is a summary of the most relevant alternatives, how they compare to this template, and when you might prefer one over another.
+
+### NixOS Deployment Tools
+
+#### [NixOps](https://github.com/NixOS/nixops)
+
+NixOps is the original NixOS deployment tool. It manages infrastructure state (which machines exist, their IP addresses, etc.) in a local state file and can provision cloud resources directly (e.g., AWS EC2 instances, GCP VMs).
+
+- **Similarities**: Declarative NixOS configuration, multi-host support, secret provisioning.
+- **Differences**: NixOps manages cloud infrastructure lifecycle (create/destroy VMs), while this template assumes the server already exists. NixOps uses a local state file rather than Git and CI/CD for coordination. NixOps does not natively use flakes, though community forks add flake support.
+
+#### [deploy-rs](https://github.com/serokell/deploy-rs)
+
+deploy-rs is a lightweight, flake-native deployment tool written in Rust. It pushes Nix store paths to remote hosts and activates them, with built-in support for rollback on failure.
+
+- **Similarities**: Flake-native, pushes NixOS configurations to remote hosts, supports multi-host deployments.
+- **Differences**: deploy-rs focuses solely on deployment activation (push and switch) and does not handle initial provisioning, disk partitioning, or secret encryption. It runs from the command line rather than through CI/CD workflows, though it can be integrated into CI pipelines. It includes automatic rollback if a deployment fails health checks.
+
+#### [Colmena](https://github.com/zhaofengli/colmena)
+
+Colmena is a deployment tool inspired by NixOps and morph. It supports parallel deployments, flakes, and a custom module-based configuration for defining hosts.
+
+- **Similarities**: Declarative multi-host NixOS configuration, flake support, remote deployment via SSH.
+- **Differences**: Colmena has its own host definition format (`colmena.nix` or flake-based) and supports parallel deployment to many machines simultaneously. Like deploy-rs, it does not handle initial provisioning or secret encryption. It includes a local evaluation mode for faster iteration and supports deployment to hosts behind a bastion/jump server.
+
+#### [morph](https://github.com/DBCDK/morph)
+
+morph is a NixOS deployment tool that provides a simple, imperative-style CLI for managing fleets of NixOS machines.
+
+- **Similarities**: SSH-based deployment, declarative NixOS configuration, multi-host support.
+- **Differences**: morph uses its own `network.nix` format for defining hosts rather than flakes. It supports health checks and rollback, similar to deploy-rs. It does not handle provisioning, disk configuration, or secret management.
+
+#### [nixinate](https://github.com/MatthewCroughan/nixinate)
+
+nixinate is a minimal flake-based deployment tool that generates deployment scripts from your flake's `nixosConfigurations`.
+
+- **Similarities**: Flake-native, generates deployment commands for each host, uses `nixos-rebuild switch` under the hood.
+- **Differences**: nixinate is intentionally minimal — it adds a `deploy` app to your flake and nothing else. It does not handle provisioning, secrets, or CI/CD integration.
+
+#### [nixos-rebuild](https://nixos.wiki/wiki/Nixos-rebuild) (with `--target-host`)
+
+The built-in `nixos-rebuild` command supports deploying to remote hosts via `--target-host` and `--build-host` flags, without any additional tooling.
+
+- **Similarities**: Uses the same underlying mechanism (`nixos-rebuild switch`) that this template invokes over SSH.
+- **Differences**: Requires manual invocation, no CI/CD integration, no provisioning, no secret management. It is the simplest approach but requires the most manual effort for multi-environment setups.
+
+### Secret Management
+
+This template uses [agenix](https://github.com/ryantm/agenix) for secret management. The main alternative is:
+
+#### [sops-nix](https://github.com/Mic92/sops-nix)
+
+sops-nix integrates [Mozilla SOPS](https://github.com/getsops/sops) with NixOS for secret management. It supports multiple encryption backends including age, GPG, and cloud KMS (AWS, GCP, Azure).
+
+- **Similarities**: Encrypts secrets in the repository, decrypts them on the target host at activation time, integrates with NixOS modules.
+- **Differences**: sops-nix supports structured secret formats (YAML, JSON, binary) rather than agenix's single-file approach. It can use cloud KMS for key management, which avoids distributing private keys. agenix is simpler and uses only age/SSH keys, while sops-nix is more flexible but has more configuration overhead.
+
+### Comparison Table
+
+| Feature | This Template | NixOps | deploy-rs | Colmena | morph | nixinate |
+|---|---|---|---|---|---|---|
+| Initial provisioning | ✅ (nixos-anywhere) | ✅ (cloud APIs) | ❌ | ❌ | ❌ | ❌ |
+| Disk partitioning | ✅ (disko) | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Secret management | ✅ (agenix) | ✅ (built-in) | ❌ | ❌ | ❌ | ❌ |
+| Flake support | ✅ | ⚠️ (community forks) | ✅ | ✅ | ❌ | ✅ |
+| CI/CD integration | ✅ (GitHub Actions) | ❌ | ❌ (manual) | ❌ (manual) | ❌ (manual) | ❌ (manual) |
+| Rollback on failure | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ |
+| Parallel deployment | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Cloud resource management | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Multi-host support | ✅ (one per environment) | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+This template combines provisioning (nixos-anywhere), disk management (disko), secrets (agenix), and CI/CD (GitHub Actions) into a single opinionated workflow. The alternatives listed above are generally more focused tools that handle one or two of these concerns and can be composed together for a custom setup.
