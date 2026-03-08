@@ -1,3 +1,4 @@
 [
   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFRoBHw53AM/snEbOYwp12GBOTnkFueYmFl23jBdFHz+" # CD
+  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA+C4/bDRF1a0x1yKR4Jqt7v1b1hnQJywzDnk0Pn+Afx root@production"
 ]
