@@ -3,6 +3,7 @@
 > **⚠️ Unfinished — use at your own risk.**
 > This template relies on `sed`-based string manipulation of several files and may break if the included workflows or NixOS config files are renamed or restructured.
 > It is intended for personal projects and has only been tested with Hetzner Cloud VPSs. Other providers may require changes to `disk-config.nix`.
+> Some environment names are invalid. This is unchecked. names like "dev", "staging" and "prod" are valid.
 
 A template for deploying [NixOS](https://nixos.org/) to a remote server using [nixos-anywhere](https://github.com/nix-community/nixos-anywhere), with secrets managed by [agenix](https://github.com/ryantm/agenix) and CI/CD powered by GitHub Actions.
 
@@ -53,32 +54,32 @@ Generated configuration files for each deployment are committed back to the repo
   - One for root access to deployed hosts
   - One for agenix secret encryption
 
-## Repository Structure
+## Repository Structure (some files omitted)
 
 ```
 .
-├── .env.template                        # Template for environment variables
 ├── .github/workflows/
 │   ├── bootstrap.yaml                   # Workflow: initial server provisioning
 │   └── update.yaml                      # Workflow: update an existing server
-├── flake.nix                            # Nix flake entry point
-├── flake.lock                           # Pinned flake input versions
-├── modules/
-│   ├── flake-parts.nix                  # Target system configuration (x86_64-linux)
-│   ├── hosts/
-│   │   └── bootstrap/
-│   │       └── configuration.nix        # Bootstrap host template (copied per host)
-│   └── nixosModules/
-│       ├── setup/
-│       │   ├── bootstrap.nix            # Base NixOS module (boot, packages, SSH, flakes)
-│       │   └── disk-config.nix          # Disk partitioning via disko
-│       ├── common.nix                   # Post-bootstrap module (adds agenix secrets)
-│       ├── secrets.nix                  # agenix secret declarations (.env)
-│       ├── ssh-root.nix                 # OpenSSH config + root authorized keys
-│       └── app-user.nix                 # Creates the unprivileged `app` user
-└── secrets/
-    ├── keys.nix                         # Public keys authorized to decrypt secrets
-    └── secrets.nix                      # agenix secret file declarations
+└── deployment                           # Main dir for deployment code
+    ├── flake.nix                        # Nix flake entry point
+    ├── .env.template                    # Template for environment variables
+    ├── modules/
+    │   ├── flake-parts.nix              # Target system configuration (x86_64-linux)
+    │   ├── hosts/
+    │   │   └── bootstrap/
+    │   │       └── configuration.nix    # Bootstrap host template (copied per host)
+    │   └── nixosModules/
+    │       ├── setup/
+    │       │   ├── bootstrap.nix        # Base NixOS module (boot, packages, SSH, flakes)
+    │       │   └── disk-config.nix      # Disk partitioning via disko
+    │       ├── common.nix               # Post-bootstrap module (adds agenix secrets)
+    │       ├── secrets.nix              # agenix secret declarations (.env)
+    │       ├── ssh-root.nix             # OpenSSH config + root authorized keys
+    │       └── app-user.nix             # Creates the unprivileged `app` user
+    └── secrets/
+        ├── keys.nix                     # Public keys authorized to decrypt secrets
+        └── secrets.nix                  # agenix secret file declarations
 ```
 
 After bootstrapping a host named `my-server`, the following files are generated and committed:
