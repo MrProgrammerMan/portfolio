@@ -89,4 +89,4 @@ jobs:
           username: root
           key: ${{ secrets.SSH_ROOT_KEY }}
           script: |
-            nixos-rebuild switch --flake github:${{ github.repository }}/${{ github.ref_name }}#$HOSTNAME
+            nixos-rebuild switch --flake github:${{ github.repository }}/${{ github.ref_name }}?dir=deployment#$HOSTNAME
