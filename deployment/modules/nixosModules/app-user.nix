@@ -1,10 +1,12 @@
 { ... }: {
   flake.nixosModules.app-user = { ... }: {
     users.users.app = {
-      isNormalUser = true;
-      home = "/home/app";
-      extraGroups = [ "networkmanager" "app" ];
+      isSystemUser = true;
+      group = "app";
+      uid = 999;
     };
-    users.groups.app = {};
+    users.groups.app = {
+      gid = 999;
+    };
   };
 }
