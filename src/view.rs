@@ -1,16 +1,14 @@
 use leptos::prelude::*;
 use leptos_router::{components::{Route, Router, Routes, A}, path};
+use r#static::header::Header;
+
+mod r#static;
 
 #[component]
 pub fn App() -> impl IntoView {
     view! {
         <Router>
-            <nav>
-                <A href="/">"Home"</A>
-                <A href="/about">"About"</A>
-                <A href="/portfolio">"Portfolio"</A>
-                <A href="/contact">"Contact"</A>
-            </nav>
+            <Header/>
             <main>
                 <Routes fallback=|| "Not found.">
                     <Route path=path!("/") view=Home/>
