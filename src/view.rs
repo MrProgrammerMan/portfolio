@@ -1,5 +1,8 @@
 use leptos::prelude::*;
-use leptos_router::{components::{Route, Router, Routes, A}, path};
+use leptos_router::{
+    components::{Route, Router, Routes},
+    path,
+};
 use r#static::header::Header;
 
 mod r#static;
@@ -8,13 +11,13 @@ mod r#static;
 pub fn App() -> impl IntoView {
     view! {
         <Router>
-            <Header/>
+            <Header />
             <main>
                 <Routes fallback=|| "Not found.">
-                    <Route path=path!("/") view=Home/>
-                    <Route path=path!("/about") view=About/>
-                    <Route path=path!("/portfolio") view=Portfolio/>
-                    <Route path=path!("/contact") view=Contact/>
+                    <Route path=path!("/") view=Home />
+                    <Route path=path!("/about") view=About />
+                    <Route path=path!("/portfolio") view=Portfolio />
+                    <Route path=path!("/contact") view=Contact />
                 </Routes>
             </main>
         </Router>
@@ -23,20 +26,20 @@ pub fn App() -> impl IntoView {
 
 #[component]
 fn Home() -> impl IntoView {
-    view! {"The home page"}
+    view! { "The home page" }
 }
 
 #[component]
 fn About() -> impl IntoView {
-    view! {"The about page"}
+    view! { "The about page" }
 }
 
 #[component]
 fn Portfolio() -> impl IntoView {
-    view! {"The portfolio page"}
+    view! { "The portfolio page" }
 }
 
 #[component]
 fn Contact() -> impl IntoView {
-    view! {"The contact page"}
+    view! { "The contact page" }
 }
