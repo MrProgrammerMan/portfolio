@@ -113,7 +113,20 @@ fn About() -> impl IntoView {
 
 #[component]
 fn Portfolio() -> impl IntoView {
-    view! { "The portfolio page" }
+    view! {
+        <section class="full">
+            <div>
+                <h1>"Coming soon"</h1>
+                <br/>
+                <p>
+                    "I'm working on it..."
+                </p>
+                <a href="https://github.com/MrProgrammerMan/portfolio">
+                    "source"
+                </a>
+            </div>
+        </section>
+    }
 }
 
 #[component]

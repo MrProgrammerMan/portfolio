@@ -149,6 +149,12 @@ main > section > * {
     margin: 3em;
 }
 
+main > .full > * {
+    width: 100%;
+    margin: 3em;
+    text-align: center;
+}
+
 /* ======== FOOTER ======== */
 
 footer {
