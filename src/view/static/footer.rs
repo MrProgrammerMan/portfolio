@@ -5,8 +5,12 @@ pub fn Footer() -> impl IntoView {
     view! {
         <footer>
             <section>
-                <LinkedInLogo />
-                <GitHubLogo />
+                <a href="https://www.linkedin.com/in/jonas-baugerud/">
+                    <LinkedInLogo />
+                </a>
+                <a href="https://github.com/MrProgrammerMan">
+                    <GitHubLogo />
+                </a>
             </section>
             <section>
                 <p>"©2026"</p>
