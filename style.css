@@ -1,0 +1,50 @@
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --isabelline: #F4F3EE;
+    --eerie-black-light: #232323;
+    --eerie-black-dark: #181818;
+    --keppel: #16BBA0;
+    --cerulean: #008EAD;
+    --eerie-black-extra-dark: #121212;
+    --cerulean-dark: #00576B;
+    --cerulean-extra-dark: #004757;
+    --link-color: #7888FF;
+    --eerie-black-light-half: rgba(35, 35, 35, 0.5);
+}
+
+body {
+    background-color: var(--eerie-black-extra-dark);
+    color: var(--isabelline);
+}
+
+a {
+    color: var(--link-color);
+}
+
+nav svg {
+    color: var(--keppel);
+}
+
+nav a {
+    color: var(--isabelline);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    height: 44px;
+    padding: 15px;
+    font-size: 14px;
+    transition: color .1s;
+}
+
+nav a:hover {
+    color: var(--keppel);
+}
+
+nav a[aria-current="page"] {
+    color: var(--cerulean);
+}
