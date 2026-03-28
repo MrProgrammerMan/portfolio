@@ -156,6 +156,7 @@ footer {
     height: 44px;
     background-color: var(--eerie-black-light);
     border-top: 1px solid var(--isabelline);
+    overflow: hidden;
 }
 
 footer > section {
@@ -169,9 +170,12 @@ footer > section:first-child {
     flex: 0 0 auto;
 }
 
-footer > section:first-child svg, footer > section:last-child svg {
+footer a, footer svg {
     height: 44px;
     margin: 0;
+}
+
+footer svg {
     padding: 6px;
     cursor: pointer;
 }
@@ -179,6 +183,7 @@ footer > section:first-child svg, footer > section:last-child svg {
 /* Copyright (middle section) */
 footer > section:nth-child(2) {
     flex: 1;
+    flex-direction: column;
     justify-content: center;
     gap: 0.4em;
 }
