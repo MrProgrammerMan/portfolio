@@ -15,6 +15,7 @@
     --cerulean-extra-dark: #004757;
     --link-color: #7888FF;
     --eerie-black-light-half: rgba(35, 35, 35, 0.5);
+    scroll-behavior: smooth;
 }
 
 body {

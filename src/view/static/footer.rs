@@ -13,7 +13,7 @@ pub fn Footer() -> impl IntoView {
                 <p>"Jonas Hazeland Baugerud"</p>
             </section>
             <section>
-                <ToTopArrow />
+                <a href="#"><ToTopArrow /></a>
             </section>
         </footer>
     }
