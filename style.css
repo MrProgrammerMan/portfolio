@@ -26,25 +26,59 @@ a {
     color: var(--link-color);
 }
 
-nav svg {
-    color: var(--keppel);
+header * {
+    display: inline-flex;
+    height: 44px;
 }
 
-nav a {
+header a, header p {
+    font-size: 14px;
+    padding: 15px;
+    align-items: center;
+}
+
+header a {
     color: var(--isabelline);
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    height: 44px;
-    padding: 15px;
-    font-size: 14px;
     transition: color .1s;
 }
 
-nav a:hover {
+header a:hover {
     color: var(--keppel);
 }
 
-nav a[aria-current="page"] {
+header a[aria-current="page"] {
     color: var(--cerulean);
+}
+
+header svg, header p {
+    vertical-align: middle;
+    width: auto;
+}
+
+header p {
+    color: var(--keppel) /* Animation? */
+}
+
+header p {
+    background: linear-gradient(
+        90deg,
+        #7888FF 0%,
+        #16BBA0 16.6%,
+        #7888FF 33.3%,
+        #16BBA0 50%,
+        #7888FF 66.6%,
+        #16BBA0 83.3%,
+        #7888FF 100%    /* matches 0% */
+    );
+    background-size: 400% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: ripple 20s ease-in-out infinite;
+}
+
+@keyframes ripple {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
 }
