@@ -1,0 +1,157 @@
+.line {
+  grid-column: 3 / 11;
+  height: 0.1875rem;
+  margin: 0.625rem 0;
+  background-color: var(--isabelline);
+  box-shadow: 0 0 0.0625rem var(--isabelline);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100%;
+}
+
+.line > p {
+  background-color: var(--eerie-black-extra-dark);
+  padding: 0 0.3125rem;
+}
+
+#about ul {
+  padding: 0;
+}
+
+#about li {
+  list-style-type: none;
+  font-size: 1.2em;
+  margin: 10px;
+}
+
+#rel-ex h2 {
+  width: 100%;
+  text-align: center;
+  margin: .5em 0;
+}
+
+#rel-ex ul {
+  position: relative;
+  width: 65%;
+  margin: 0 auto;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  #rel-ex ul {
+    width: 85%;
+  }
+}
+
+@media (max-width: 480px) {
+  #rel-ex ul {
+    width: 100%;
+  }
+}
+
+#rel-ex ul::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--keppel);
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+#rel-ex li {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 2em 0;
+  z-index: 2;
+}
+
+#rel-ex li::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: .8em;
+  height: .8em;
+  background: var(--cerulean);
+  border-radius: 50%;
+  z-index: 3;
+}
+
+#rel-ex ul :nth-child(odd) {
+  flex-direction: row-reverse;
+}
+
+#rel-ex ul :nth-child(even) {
+  flex-direction: row;
+}
+
+#rel-ex li :nth-child(1) {
+  color: var(--keppel);
+}
+
+#rel-ex li > p {
+  width: 50%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#rel-ex ul > :nth-child(even) > :nth-child(1) {
+  justify-content: right;
+  text-align: right;
+  margin-right: 2em;
+}
+
+#rel-ex ul > :nth-child(odd) > :nth-child(1) {
+  justify-content: left;
+  text-align: left;
+  margin-left: 2em;
+}
+
+#rel-ex ul > .arrow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.arrow :nth-child(1) {
+  width: 2px;
+  height: 1em;
+  background-color: var(--keppel);
+}
+
+.arrow :nth-child(2),
+.arrow :nth-child(3) {
+  width: .75em;
+  height: 2px;
+  background-color: var(--keppel);
+  position: absolute;
+  top: -2px;
+}
+
+.arrow :nth-child(2) {
+  transform: rotate(-45deg);
+  transform-origin: top right;
+  right: 100%;
+}
+
+.arrow :nth-child(3) {
+  transform: rotate(45deg);
+  transform-origin: top left;
+  left: 100%;
+}
