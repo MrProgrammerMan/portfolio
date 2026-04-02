@@ -11,6 +11,10 @@
         f
         trunk
         leptosfmt
+        cargo-leptos
+        sass
+        nodejs_25
+        wasm-bindgen-cli_0_2_117
       ];
     };
   };
