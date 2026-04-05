@@ -1,5 +1,5 @@
 { inputs, self, ... }: {
-  flake.nixosModules.default = { config, lib, pkgs, system, ... }:
+  flake.nixosModules.default = { config, lib, pkgs, ... }:
     let
         cfg = config.services.portfolio;
     in {
@@ -7,7 +7,7 @@
         enable = lib.mkEnableOption "portfolio";
         package = lib.mkOption {
           type = lib.types.package;
-          default = self.packages.${system}.default;
+          default = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
           description = "The package to use for the portfolio.";
         };
       };

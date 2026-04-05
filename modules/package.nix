@@ -26,6 +26,7 @@
         binaryen
         makeWrapper
       ];
+      meta.mainProgram = "portfolio";
 
       HOME = "/build";
       SASS_PATH = "${pkgs.dart-sass}/bin/sass";
