@@ -53,7 +53,7 @@ fn Home() -> impl IntoView {
     view! {
         <section class="reverse">
             <div>
-                <img src="portrait.jpg" alt="Portrait of me, Jonas Hazeland Baugerud." />
+                <img src="portrait.avif" alt="Portrait of me, Jonas Hazeland Baugerud." />
             </div>
             <div>
                 <h1>"Hello, I'm Jonas"</h1>
@@ -83,7 +83,7 @@ fn About() -> impl IntoView {
         </span>
         <section id="about">
             <div>
-                <img src="portrait.jpg" alt="Portrait of me." />
+                <img src="portrait.avif" alt="Portrait of me." />
             </div>
             <div>
                 <h1>"About"</h1>
@@ -136,7 +136,7 @@ fn About() -> impl IntoView {
                 <p>"This section will be filled in soon. Lorem ipsum dolor sit amet."</p>
             </div>
             <div>
-                <img src="portrait.jpg" alt="Portrait of me." />
+                <img src="portrait.avif" alt="Portrait of me." />
             </div>
         </section>
     }
@@ -161,7 +161,7 @@ fn Contact() -> impl IntoView {
     view! {
         <section>
             <div>
-                <img src="portrait.jpg" alt="Portrait of me." />
+                <img src="portrait.avif" alt="Portrait of me." />
             </div>
             <div>
                 <h1>"Contact"</h1>
