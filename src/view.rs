@@ -133,7 +133,7 @@ fn About() -> impl IntoView {
                 <p>
                     "If you made it this far and you’re still reading, I figure you may want to know more about me as a person."
                 </p>
-                <p>"I grew up in a small town near Elverum."</p>
+                <p>"This section will be filled in soon. Lorem ipsum dolor sit amet."</p>
             </div>
             <div>
                 <img src="portrait.jpg" alt="Portrait of me." />
