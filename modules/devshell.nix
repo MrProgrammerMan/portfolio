@@ -12,9 +12,10 @@
         trunk
         leptosfmt
         cargo-leptos
-        sass
+        dart-sass
         nodejs_25
         wasm-bindgen-cli_0_2_117
+        binaryen
       ];
     };
   };
