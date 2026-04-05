@@ -9,11 +9,9 @@
     devShells.default = pkgs.mkShell {
       packages = with pkgs; [
         f
-        trunk
         leptosfmt
         cargo-leptos
         dart-sass
-        nodejs_25
         wasm-bindgen-cli_0_2_117
         binaryen
       ];
