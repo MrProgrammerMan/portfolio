@@ -7,6 +7,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     import-tree.url = "github:vic/import-tree";
+    crane.url = "github:ipetkov/crane";
   };
   outputs = inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; }
