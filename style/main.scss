@@ -58,9 +58,13 @@ header {
     );
 }
 
-header * {
+header *, header img {
     display: inline-flex;
     height: 44px;
+}
+
+header img, footer img {
+    width: auto;
 }
 
 header a, header p {
@@ -79,7 +83,7 @@ header a:hover { color: var(--keppel); }
 header a:active { color: var(--cerulean-dark); }
 header a[aria-current="page"] { color: var(--cerulean); }
 
-header svg, header p {
+header img, header p {
     vertical-align: middle;
 }
 
@@ -182,11 +186,11 @@ footer > section:first-child {
     bottom: 0;
 }
 
-footer a, footer svg {
+footer a, footer img {
     height: 44px;
 }
 
-footer svg {
+footer img {
     padding: 6px;
     cursor: pointer;
 }
