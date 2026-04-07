@@ -3,13 +3,12 @@ This repository contains the code for what will be my full portfolio site. For t
 
 ## Roadmap
 Features to be implemented:
-1. Gootle OIDC: Can't do much without this unless I wanna let anyone edit my portfolio.
-2. JWT, refresh tokens in Redis.
-3. SQLX postgres connection.
+1. Gootle OIDC using [openidconnect](https://crates.io/crates/openidconnect)
+2. SQLX postgres connection.
+3. JWT, refresh tokens in postgres.
 4. Admin pages(hopefully you won't see these O__o)
 5. Projects page
 6. MinIO dynamic image storage.
-7. Caching in Redis(I mean I have it running anyways, why not...)
-8. Postgres backup(likely part of the deployment system)
-9. Logging(should look into this)
-10. Collaborator profiles
+7. postgres backup(likely part of the deployment system)
+8. Logging(should look into this)
+9. Collaborator profiles
