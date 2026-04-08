@@ -5,3 +5,4 @@ result
 .sass-cache
 nixos.qcow2
 ssh_keys
+.env
