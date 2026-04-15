@@ -1,10 +1,12 @@
 use crate::view::pages::{
-    admin::AdminRoutes, login::Login, public::{Public, PublicRoutes}
+    admin::AdminRoutes,
+    login::Login,
+    public::{Public, PublicRoutes},
 };
 use leptos::prelude::*;
 use leptos_meta::{MetaTags, Stylesheet, provide_meta_context};
 use leptos_router::{
-    components::{ParentRoute, Router, Routes, Route},
+    components::{ParentRoute, Route, Router, Routes},
     path,
 };
 use pages::admin::Admin;
