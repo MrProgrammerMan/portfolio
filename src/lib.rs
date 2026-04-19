@@ -1,3 +1,7 @@
+#[cfg(feature = "ssr")]
+pub mod auth;
+#[cfg(feature = "ssr")]
+pub mod state;
 pub mod view;
 
 #[cfg(feature = "hydrate")]
