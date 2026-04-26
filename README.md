@@ -6,7 +6,7 @@ Work in progress — building this out piece by piece. It'll be something eventu
 
 | Feature | Status |
 |---|---|
-| Google OIDC via [`openidconnect`](https://crates.io/crates/openidconnect) | ✅ Planned |
+| Google OIDC via [`openidconnect`](https://crates.io/crates/openidconnect) | ✅ Done |
 | Postgres connection via [`sqlx`](https://crates.io/crates/sqlx) | ⬜ Planned |
 | [`JWT`](https://crates.io/crates/jwt) auth + refresh tokens in Postgres | ⬜ Planned |
 | Admin pages *(hopefully you'll never see these 👀)* | ⬜ Planned |
