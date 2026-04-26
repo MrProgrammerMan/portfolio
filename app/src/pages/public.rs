@@ -1,5 +1,4 @@
 use leptos::prelude::*;
-#[allow(unused_imports)]
 use leptos_router::{
     MatchNestedRoutes,
     any_nested_route::IntoAnyNestedRoute,
@@ -7,7 +6,7 @@ use leptos_router::{
     path,
 };
 
-use crate::view::{
+use crate::{
     pages::public::{about::About, contact::Contact, home::Home, portfolio::Portfolio},
     r#static::{footer::Footer, header::Header},
 };

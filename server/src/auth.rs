@@ -9,7 +9,7 @@ use openidconnect::{
 use serde::Deserialize;
 use tower_sessions::Session;
 
-use crate::state::AppState;
+use app::state::AppState;
 
 #[derive(Deserialize)]
 pub struct CallbackParams {
