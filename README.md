@@ -1,14 +1,17 @@
-# Portfolio site
-This repository contains the code for what will be my full portfolio site. For the time being it's a bit lacking, but I'm working on it.
+# 🗂️ Portfolio Site
+
+Work in progress — building this out piece by piece. It'll be something eventually.
 
 ## Roadmap
-Features to be implemented:
-1. Gootle OIDC using [openidconnect](https://crates.io/crates/openidconnect)
-2. [SQLX](https://crates.io/crates/sqlx) postgres connection.
-3. [JWT](https://crates.io/crates/jwt), refresh tokens in postgres.
-4. Admin pages(hopefully you won't see these O__o)
-5. Projects page
-6. [MinIO](https://crates.io/crates/aws-sdk-s3) dynamic image storage.
-7. postgres backup(likely part of the deployment system)
-8. Logging(should look into this)
-9. Collaborator profiles
+
+| Feature | Status |
+|---|---|
+| Google OIDC via [`openidconnect`](https://crates.io/crates/openidconnect) | [x] Planned |
+| Postgres connection via [`sqlx`](https://crates.io/crates/sqlx) | [ ] Planned |
+| [`JWT`](https://crates.io/crates/jwt) auth + refresh tokens in Postgres | [ ] Planned |
+| Admin pages *(hopefully you'll never see these 👀)* | [ ] Planned |
+| Projects page | [ ] Planned |
+| Dynamic image storage via [MinIO](https://crates.io/crates/aws-sdk-s3) | [ ] Planned |
+| Postgres backups | [ ] Planned |
+| Logging | [ ] Planned |
+| Collaborator profiles | [ ] Planned |
