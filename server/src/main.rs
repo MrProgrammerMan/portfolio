@@ -1,4 +1,7 @@
+use crate::auth::auth_login_handler;
+
 pub mod auth;
+pub mod state;
 
 #[tokio::main]
 async fn main() {
@@ -7,7 +10,8 @@ async fn main() {
     use leptos::prelude::*;
     use leptos_axum::{LeptosRoutes, generate_route_list};
     use auth::auth_callback_handler;
-    use app::{state::AppState, App, shell};
+    use app::{App, shell};
+    use state::AppState;
     use tower_sessions::{MemoryStore, SessionManagerLayer};
 
     dotenvy::dotenv().ok();
@@ -25,6 +29,7 @@ async fn main() {
         .with_same_site(leptos_use::SameSite::Lax);
 
     let app = Router::new()
+        .route("/auth/login", get(auth_login_handler))
         .route("/auth/callback", get(auth_callback_handler))
         .leptos_routes(&state, routes, {
             let leptos_options = state.leptos_options.clone();
