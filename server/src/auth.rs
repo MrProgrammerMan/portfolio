@@ -67,8 +67,8 @@ pub async fn auth_callback_handler(
         Ok(Some(v)) => v,
         _ => return Err((StatusCode::BAD_REQUEST, "Missing PKCE verifier".to_string())),
     };
-    let nonce = match session.get("nonce").await {
-        Ok(Some(v)) => Nonce::from(v),
+    let nonce = match session.get::<Nonce>("nonce").await {
+        Ok(Some(v)) => v,
         _ => return Err((StatusCode::BAD_REQUEST, "Missing nonce".to_string())),
     };
 

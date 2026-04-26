@@ -1,13 +1,10 @@
-use axum::{
-    extract::Request,
-    middleware::{Next, from_fn},
-    response::IntoResponse,
-};
+use axum::middleware::from_fn;
 
-use crate::auth::auth_login_handler;
+use crate::{auth::auth_login_handler, middleware::jwt::jwt_validation};
 
 pub mod auth;
 pub mod error;
+pub mod middleware;
 pub mod state;
 
 #[tokio::main]
@@ -61,8 +58,4 @@ async fn main() {
     axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
-}
-
-async fn jwt_validation(req: Request, next: Next) -> impl IntoResponse {
-    next.run(req).await // TODO: Not yet implemented
 }
