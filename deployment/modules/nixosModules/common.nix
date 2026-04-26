@@ -9,7 +9,10 @@
       inputs.portfolio.nixosModules.default
     ];
 
-    services.portfolio.enable = true;
+    services.portfolio = {
+      enable = true;
+      environmentFiles = [ "/run/secrets/.env" ];
+    };
 
     services.caddy ={
       enable = true; # Should reverse proxy to localhost 3000
