@@ -42,13 +42,15 @@ impl AppState {
             .await
             .expect("Provider metadata should be discoverable");
 
+        let site_addr = std::env::var("URL").expect("URL should be set");
+
         let oauth_client = CoreClient::from_provider_metadata(
             provider_metadata,
             ClientId::new(client_id),
             Some(ClientSecret::new(client_secret)),
         )
         .set_redirect_uri(
-            RedirectUrl::new("http://localhost:3000/auth/callback".to_string())
+            RedirectUrl::new(site_addr + "/auth/callback")
                 .expect("Should be able to set redirect uri"),
         );
 
