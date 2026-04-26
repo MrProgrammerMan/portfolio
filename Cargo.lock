@@ -39,6 +39,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 
 [[package]]
+name = "app"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "axum-extra",
+ "dotenvy",
+ "leptos",
+ "leptos-use",
+ "leptos_axum",
+ "leptos_meta",
+ "leptos_router",
+ "openidconnect",
+ "serde",
+ "tokio",
+ "tower-sessions",
+]
+
+[[package]]
 name = "async-lock"
 version = "3.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -798,6 +816,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf"
 dependencies = [
  "percent-encoding",
+]
+
+[[package]]
+name = "frontend"
+version = "0.1.0"
+dependencies = [
+ "app",
+ "console_error_panic_hook",
+ "leptos",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -2071,26 +2099,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "portfolio"
-version = "0.1.0"
-dependencies = [
- "axum",
- "axum-extra",
- "console_error_panic_hook",
- "dotenvy",
- "leptos",
- "leptos-use",
- "leptos_axum",
- "leptos_meta",
- "leptos_router",
- "openidconnect",
- "serde",
- "tokio",
- "tower-sessions",
- "wasm-bindgen",
-]
-
-[[package]]
 name = "potential_utf"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2818,6 +2826,24 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "server"
+version = "0.1.0"
+dependencies = [
+ "app",
+ "axum",
+ "dotenvy",
+ "leptos",
+ "leptos-use",
+ "leptos_axum",
+ "leptos_meta",
+ "leptos_router",
+ "openidconnect",
+ "serde",
+ "tokio",
+ "tower-sessions",
 ]
 
 [[package]]

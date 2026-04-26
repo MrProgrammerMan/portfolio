@@ -1,11 +1,13 @@
-#[cfg(feature = "ssr")]
+pub mod auth;
+
 #[tokio::main]
 async fn main() {
     use axum::{Router, routing::get};
     use leptos::logging::log;
     use leptos::prelude::*;
     use leptos_axum::{LeptosRoutes, generate_route_list};
-    use portfolio::{auth::auth_callback_handler, state::AppState, view::*};
+    use auth::auth_callback_handler;
+    use app::{state::AppState, App, shell};
     use tower_sessions::{MemoryStore, SessionManagerLayer};
 
     dotenvy::dotenv().ok();
@@ -39,11 +41,4 @@ async fn main() {
     axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
-}
-
-#[cfg(not(feature = "ssr"))]
-pub fn main() {
-    // no client-side main function
-    // unless we want this to work with e.g., Trunk for pure client-side testing
-    // see lib.rs for hydration function instead
 }

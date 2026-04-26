@@ -1,4 +1,4 @@
-use crate::view::pages::{
+use crate::pages::{
     admin::AdminRoutes,
     login::Login,
     public::{Public, PublicRoutes},
@@ -10,6 +10,9 @@ use leptos_router::{
     path,
 };
 use pages::admin::Admin;
+
+#[cfg(feature = "ssr")]
+pub mod state;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
