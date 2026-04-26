@@ -4,7 +4,8 @@ use axum::{
     response::{IntoResponse, Redirect},
 };
 use openidconnect::{
-    AccessTokenHash, AuthorizationCode, CsrfToken, Nonce, OAuth2TokenResponse, PkceCodeChallenge, PkceCodeVerifier, Scope, TokenResponse, core::CoreAuthenticationFlow
+    AccessTokenHash, AuthorizationCode, CsrfToken, Nonce, OAuth2TokenResponse, PkceCodeChallenge,
+    Scope, TokenResponse, core::CoreAuthenticationFlow,
 };
 use serde::Deserialize;
 use tower_sessions::Session;
@@ -19,7 +20,7 @@ pub struct CallbackParams {
 
 pub async fn auth_login_handler(
     State(state): State<AppState>,
-    session: Session
+    session: Session,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
 
@@ -34,10 +35,12 @@ pub async fn auth_login_handler(
         .set_pkce_challenge(pkce_challenge)
         .url();
 
-    session.insert("csrf_token", csrf_token.secret())
+    session
+        .insert("csrf_token", csrf_token.secret())
         .await
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
-    session.insert("nonce", nonce.secret())
+    session
+        .insert("nonce", nonce.secret())
         .await
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
     session
@@ -68,7 +71,7 @@ pub async fn auth_callback_handler(
     }
 
     let pkce_verifier = match session.get("pkce_verifier").await {
-        Ok(Some(v)) => PkceCodeVerifier::from(v),
+        Ok(Some(v)) => v,
         _ => return Err((StatusCode::BAD_REQUEST, "Missing PKCE verifier".to_string())),
     };
     let nonce = match session.get("nonce").await {

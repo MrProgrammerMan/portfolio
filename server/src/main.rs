@@ -5,12 +5,12 @@ pub mod state;
 
 #[tokio::main]
 async fn main() {
+    use app::{App, shell};
+    use auth::auth_callback_handler;
     use axum::{Router, routing::get};
     use leptos::logging::log;
     use leptos::prelude::*;
     use leptos_axum::{LeptosRoutes, generate_route_list};
-    use auth::auth_callback_handler;
-    use app::{App, shell};
     use state::AppState;
     use tower_sessions::{MemoryStore, SessionManagerLayer};
 
