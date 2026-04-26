@@ -17,3 +17,4 @@ leptos-use = { workspace = true }
 serde = { workspace = true }
 openidconnect = { workspace = true }
 thiserror = { workspace = true }
+jsonwebtoken = { workspace = true }

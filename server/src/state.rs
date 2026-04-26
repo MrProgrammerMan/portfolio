@@ -1,4 +1,5 @@
 use axum::extract::FromRef;
+use jsonwebtoken::{DecodingKey, EncodingKey};
 use leptos::config::LeptosOptions;
 use openidconnect::{
     ClientId, ClientSecret, EndpointMaybeSet, EndpointNotSet, EndpointSet, IssuerUrl, RedirectUrl,
@@ -20,6 +21,8 @@ pub struct AppState {
     pub leptos_options: LeptosOptions,
     pub oauth_client: OidcClient,
     pub http_client: Client,
+    pub jwt_encode: EncodingKey,
+    pub jwt_decode: DecodingKey,
 }
 
 impl FromRef<AppState> for LeptosOptions {
@@ -54,10 +57,17 @@ impl AppState {
                 .expect("Should be able to set redirect uri"),
         );
 
+        let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET should be set");
+
+        let jwt_encode = EncodingKey::from_secret(jwt_secret.as_ref());
+        let jwt_decode = DecodingKey::from_secret(jwt_secret.as_ref());
+
         AppState {
             leptos_options,
             oauth_client,
             http_client,
+            jwt_encode,
+            jwt_decode,
         }
     }
 }
