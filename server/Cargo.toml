@@ -16,3 +16,4 @@ tower-sessions = { workspace = true }
 leptos-use = { workspace = true }
 serde = { workspace = true }
 openidconnect = { workspace = true }
+thiserror = { workspace = true }

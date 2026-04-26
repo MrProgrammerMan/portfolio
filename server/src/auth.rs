@@ -10,7 +10,7 @@ use openidconnect::{
 use serde::Deserialize;
 use tower_sessions::Session;
 
-use crate::state::AppState;
+use crate::{error::AppError, state::AppState};
 
 #[derive(Deserialize)]
 pub struct CallbackParams {
@@ -21,7 +21,7 @@ pub struct CallbackParams {
 pub async fn auth_login_handler(
     State(state): State<AppState>,
     session: Session,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
+) -> Result<impl IntoResponse, AppError> {
     let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
 
     let (auth_url, csrf_token, nonce) = state
@@ -35,18 +35,11 @@ pub async fn auth_login_handler(
         .set_pkce_challenge(pkce_challenge)
         .url();
 
-    session
-        .insert("csrf_token", csrf_token.secret())
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
-    session
-        .insert("nonce", nonce.secret())
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    session.insert("csrf_token", csrf_token.secret()).await?;
+    session.insert("nonce", nonce.secret()).await?;
     session
         .insert("pkce_verifier", pkce_verifier.secret())
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+        .await?;
 
     Ok(Redirect::to(auth_url.as_str()))
 }

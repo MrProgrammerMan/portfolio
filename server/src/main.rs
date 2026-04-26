@@ -1,6 +1,7 @@
 use crate::auth::auth_login_handler;
 
 pub mod auth;
+pub mod error;
 pub mod state;
 
 #[tokio::main]
