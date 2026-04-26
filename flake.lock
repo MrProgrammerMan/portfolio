@@ -71,16 +71,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1775123071,
-        "narHash": "sha256-VXV0DPiW11XL/Nt+3W1Y8bLTL89Ju4m3vjtJ50Ts9ag=",
-        "owner": "mrprogrammerman",
+        "lastModified": 1776877367,
+        "narHash": "sha256-EHq1/OX139R1RvBzOJ0aMRT3xnWyqtHBRUBuO1gFzjI=",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "a575e25403d34775407f3245e8a014eca593aa61",
+        "rev": "0726a0ecb6d4e08f6adced58726b95db924cef57",
         "type": "github"
       },
       "original": {
-        "owner": "mrprogrammerman",
-        "ref": "wasm-bindgen-cli-0.2.117",
+        "owner": "nixos",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
