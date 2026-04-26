@@ -1,4 +1,8 @@
+use thiserror::Error;
+use tower_sessions::session;
 
+#[derive(Error, Debug)]
 enum AppError {
-    SessionError(tower_sessions::session::Error),
+    #[error("session storage failed: {0}")]
+    SessionError(#[from] session::Error),
 }
