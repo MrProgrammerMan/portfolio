@@ -11,6 +11,7 @@ use leptos_router::{
 };
 use pages::admin::Admin;
 
+#[cfg(feature = "ssr")]
 pub mod state;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
