@@ -10,17 +10,22 @@
           default = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
           description = "The package to use for the portfolio.";
         };
+        environmentFiles = lib.mkOption {
+          type = lib.types.listOf lib.types.path;
+          default = [];
+          description = "Environment files passed to systemd.";
+        };
       };
       config = lib.mkIf cfg.enable {
         systemd.services.portfolio = {
           description = "portfolio";
           wantedBy = [ "multi-user.target" ];
           after = [ "network.target" ];
-
           serviceConfig = {
             ExecStart = lib.getExe cfg.package;
             Restart = "on-failure";
             DynamicUser = true;
+            EnvironmentFile = cfg.environmentFiles;
           };
         };
       };

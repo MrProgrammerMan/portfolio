@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:mrprogrammerman/nixpkgs/wasm-bindgen-cli-0.2.117";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     fenix = {
       url = "github:nix-community/fenix";
