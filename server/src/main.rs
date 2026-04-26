@@ -2,6 +2,7 @@ use crate::auth::auth_login_handler;
 
 pub mod auth;
 pub mod state;
+pub mod error;
 
 #[tokio::main]
 async fn main() {
