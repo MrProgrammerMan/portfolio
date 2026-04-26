@@ -26,7 +26,7 @@
         binaryen
         makeWrapper
       ];
-      meta.mainProgram = "portfolio";
+      meta.mainProgram = "server";
 
       HOME = "/build";
       SASS_PATH = "${pkgs.dart-sass}/bin/sass";
@@ -50,8 +50,8 @@
         runHook preInstall
         mkdir -p $out/bin $out/site
         cp -r target/site/. $out/site/
-        cp target/release/portfolio $out/bin/portfolio
-        wrapProgram $out/bin/portfolio \
+        cp target/release/server $out/bin/server
+        wrapProgram $out/bin/server \
           --set LEPTOS_SITE_ROOT $out/site \
           --set LEPTOS_SITE_PKG_DIR pkg
         runHook postInstall
