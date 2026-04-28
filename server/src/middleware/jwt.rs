@@ -2,11 +2,9 @@ use axum::{
     extract::{Request, State},
     http::HeaderMap,
     middleware::Next,
-    response::Response,
+    response::{IntoResponse, Redirect, Response},
 };
-use jsonwebtoken::{
-    Validation, decode, errors::Error as jwtError, errors::ErrorKind as jwtErrorKind,
-};
+use jsonwebtoken::{Validation, decode, errors::ErrorKind as jwtErrorKind};
 
 use crate::{
     auth::{
@@ -23,23 +21,30 @@ pub async fn jwt_validation(
     req: Request,
     next: Next,
 ) -> Result<Response, AppError> {
-    let token_header = match headers.get("Authorization") {
+    let cookie_header = match headers.get("cookie") {
         Some(h) => h,
-        None => todo!("Missing JWT, redirect to login"),
+        None => return Ok(Redirect::to("/login").into_response()),
     };
 
-    let token_str = token_header
+    let token_str = cookie_header
         .to_str()
-        .map_err(|_| app_err(jwtErrorKind::InvalidToken))?
-        .strip_prefix("Bearer ")
-        .ok_or(app_err(jwtErrorKind::InvalidToken))?;
+        .map_err(|_| {
+            AppError::AuthError(AuthError::ValidationError("Failed to parse cookie header"))
+        })?
+        .split(';')
+        .find(|c| c.trim().starts_with("token="));
+
+    let token_str = match token_str {
+        Some(t) => t.trim().trim_start_matches("token="),
+        None => return Ok(Redirect::to("/login").into_response()),
+    };
 
     let token_result = decode::<Claims>(token_str, &state.jwt_decode, &Validation::default());
 
     let token = match token_result {
         Ok(token) => token,
         Err(e) => match e.kind() {
-            jwtErrorKind::ExpiredSignature => todo!("Refresh token"),
+            jwtErrorKind::ExpiredSignature => return Ok(Redirect::to("/login").into_response()), // TODO: refresh token
             _ => return Err(AppError::AuthError(AuthError::JWTError(e))),
         },
     };
@@ -49,8 +54,4 @@ pub async fn jwt_validation(
         #[allow(unreachable_patterns)]
         _ => Err(AppError::AuthError(AuthError::Unauthorized)),
     }
-}
-
-fn app_err(e: jwtErrorKind) -> AppError {
-    AppError::AuthError(AuthError::JWTError(jwtError::from(e)))
 }

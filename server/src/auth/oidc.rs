@@ -1,5 +1,7 @@
 use axum::{
+    body::Body,
     extract::{Query, State},
+    http::{Response, StatusCode},
     response::{IntoResponse, Redirect},
 };
 use openidconnect::{
@@ -10,7 +12,10 @@ use serde::Deserialize;
 use tower_sessions::Session;
 
 use crate::{
-    auth::error::AuthError,
+    auth::{
+        error::AuthError,
+        jwt::{self, Role},
+    },
     error::{AppError, RequestError},
     state::AppState,
 };
@@ -125,14 +130,35 @@ pub async fn auth_callback_handler(
         }
     }
 
-    println!(
-        "User {} with e-mail address {} has authenticated successfully",
-        claims.subject().as_str(),
-        claims
-            .email()
-            .map(|email| email.as_str())
-            .unwrap_or("<not provided>"),
-    );
+    if let Some(email) = claims.email().map(|email| email.as_str())
+        && email == "jonas.baugerud@gmail.com"
+    {
+        let token = jwt::generate(&app_state.jwt_encode, Role::Superuser, email.to_string())
+            .map_err(|e| AppError::AuthError(AuthError::JWTError(e)))?;
 
-    Ok("")
+        let html = format!(
+            r#"<!DOCTYPE html>
+            <html>
+            <head>
+                <meta http-equiv="refresh" content="0;url=/admin">
+                <script>window.location.href = "/admin";</script>
+            </head>
+            <body>Redirecting...</body>
+            </html>"#
+        );
+
+        let res = Response::builder()
+            .status(StatusCode::SEE_OTHER)
+            .header(
+                "Set-Cookie",
+                format!("token={}; HttpOnly; Secure; SameSite=Strict; Path=/", token),
+            )
+            .header("Content-Type", "text/html")
+            .body(Body::from(html))
+            .map_err(|_| AppError::AuthError(AuthError::Internal("Failed to build response")))?;
+
+        return Ok(res);
+    }
+
+    Err(AppError::AuthError(AuthError::Unauthorized))
 }
