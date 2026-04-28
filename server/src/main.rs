@@ -1,4 +1,4 @@
-use axum::middleware::from_fn;
+use axum::middleware::from_fn_with_state;
 
 use crate::{auth::auth_login_handler, middleware::jwt::jwt_validation};
 
@@ -40,7 +40,7 @@ async fn main() {
             let leptos_options = state.leptos_options.clone();
             move || shell(leptos_options.clone())
         })
-        .layer(from_fn(jwt_validation)) // Affects all above it
+        .layer(from_fn_with_state(state.clone(), jwt_validation)) // Affects all above it. Should be cheap to clone with internally Arc'ed fields.
         .route("/auth/login", get(auth_login_handler))
         .route("/auth/callback", get(auth_callback_handler))
         .leptos_routes(&state, public_routes, {
