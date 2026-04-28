@@ -41,6 +41,7 @@ pub async fn jwt_validation(
 
     match token.claims.role {
         Role::Superuser => Ok(next.run(req).await),
+        #[allow(unreachable_patterns)]
         _ => Err(AppError::AuthError),
     }
 }
