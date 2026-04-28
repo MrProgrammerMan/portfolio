@@ -4,10 +4,15 @@ use axum::{
     middleware::Next,
     response::Response,
 };
-use jsonwebtoken::{Validation, decode};
+use jsonwebtoken::{
+    Validation, decode, errors::Error as jwtError, errors::ErrorKind as jwtErrorKind,
+};
 
 use crate::{
-    auth::jwt::{Claims, Role},
+    auth::{
+        error::AuthError,
+        jwt::{Claims, Role},
+    },
     error::AppError,
     state::AppState,
 };
@@ -18,20 +23,34 @@ pub async fn jwt_validation(
     req: Request,
     next: Next,
 ) -> Result<Response, AppError> {
-    let token_header = headers.get("Authorization").ok_or(AppError::AuthError)?;
+    let token_header = match headers.get("Authorization") {
+        Some(h) => h,
+        None => todo!("Missing JWT, redirect to login"),
+    };
 
     let token_str = token_header
         .to_str()
-        .map_err(|_| AppError::AuthError)?
+        .map_err(|_| app_err(jwtErrorKind::InvalidToken))?
         .strip_prefix("Bearer ")
-        .ok_or(AppError::AuthError)?;
+        .ok_or(app_err(jwtErrorKind::InvalidToken))?;
 
-    let token = decode::<Claims>(token_str, &state.jwt_decode, &Validation::default())
-        .map_err(|_| AppError::AuthError)?;
+    let token_result = decode::<Claims>(token_str, &state.jwt_decode, &Validation::default());
+
+    let token = match token_result {
+        Ok(token) => token,
+        Err(e) => match e.kind() {
+            jwtErrorKind::ExpiredSignature => todo!("Refresh token"),
+            _ => return Err(AppError::AuthError(AuthError::JWTError(e))),
+        },
+    };
 
     match token.claims.role {
         Role::Superuser => Ok(next.run(req).await),
         #[allow(unreachable_patterns)]
-        _ => Err(AppError::AuthError),
+        _ => Err(AppError::AuthError(AuthError::Unauthorized)),
     }
+}
+
+fn app_err(e: jwtErrorKind) -> AppError {
+    AppError::AuthError(AuthError::JWTError(jwtError::from(e)))
 }
