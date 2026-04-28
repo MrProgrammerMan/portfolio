@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::extract::FromRef;
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use leptos::config::LeptosOptions;
@@ -19,10 +21,10 @@ pub type OidcClient = CoreClient<
 #[derive(Clone)]
 pub struct AppState {
     pub leptos_options: LeptosOptions,
-    pub oauth_client: OidcClient,
+    pub oauth_client: Arc<OidcClient>,
     pub http_client: Client,
-    pub jwt_encode: EncodingKey,
-    pub jwt_decode: DecodingKey,
+    pub jwt_encode: Arc<EncodingKey>,
+    pub jwt_decode: Arc<DecodingKey>,
 }
 
 impl FromRef<AppState> for LeptosOptions {
@@ -47,20 +49,22 @@ impl AppState {
 
         let site_addr = std::env::var("URL").expect("URL should be set");
 
-        let oauth_client = CoreClient::from_provider_metadata(
-            provider_metadata,
-            ClientId::new(client_id),
-            Some(ClientSecret::new(client_secret)),
-        )
-        .set_redirect_uri(
-            RedirectUrl::new(site_addr + "/auth/callback")
-                .expect("Should be able to set redirect uri"),
+        let oauth_client = Arc::new(
+            CoreClient::from_provider_metadata(
+                provider_metadata,
+                ClientId::new(client_id),
+                Some(ClientSecret::new(client_secret)),
+            )
+            .set_redirect_uri(
+                RedirectUrl::new(site_addr + "/auth/callback")
+                    .expect("Should be able to set redirect uri"),
+            ),
         );
 
         let jwt_secret = std::env::var("JWT_SECRET").expect("JWT_SECRET should be set");
 
-        let jwt_encode = EncodingKey::from_secret(jwt_secret.as_ref());
-        let jwt_decode = DecodingKey::from_secret(jwt_secret.as_ref());
+        let jwt_encode = Arc::new(EncodingKey::from_secret(jwt_secret.as_ref()));
+        let jwt_decode = Arc::new(DecodingKey::from_secret(jwt_secret.as_ref()));
 
         AppState {
             leptos_options,
