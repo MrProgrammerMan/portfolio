@@ -25,7 +25,7 @@ serde = { version = "1.0.228" }
 dotenvy = { version = "0.15.7" }
 tower-sessions = { version = "0.15.0" }
 thiserror = { version = "2.0.18" }
-jsonwebtoken = { version = "10.3.0" }
+jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 
 [[workspace.metadata.leptos]]
 name = "portfolio"
