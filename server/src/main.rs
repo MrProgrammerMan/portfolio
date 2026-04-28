@@ -1,6 +1,15 @@
+use crate::{
+    auth::oidc::{auth_callback_handler, auth_login_handler},
+    middleware::jwt::jwt_validation,
+};
+use app::{App, shell};
 use axum::middleware::from_fn_with_state;
-
-use crate::{auth::auth_login_handler, middleware::jwt::jwt_validation};
+use axum::{Router, routing::get};
+use leptos::logging::log;
+use leptos::prelude::*;
+use leptos_axum::{LeptosRoutes, generate_route_list};
+use state::AppState;
+use tower_sessions::{MemoryStore, SessionManagerLayer};
 
 pub mod auth;
 pub mod error;
@@ -9,15 +18,6 @@ pub mod state;
 
 #[tokio::main]
 async fn main() {
-    use app::{App, shell};
-    use auth::auth_callback_handler;
-    use axum::{Router, routing::get};
-    use leptos::logging::log;
-    use leptos::prelude::*;
-    use leptos_axum::{LeptosRoutes, generate_route_list};
-    use state::AppState;
-    use tower_sessions::{MemoryStore, SessionManagerLayer};
-
     dotenvy::dotenv().ok();
 
     let conf = get_configuration(None).unwrap();
