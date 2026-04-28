@@ -10,4 +10,6 @@ pub enum AuthError {
     ValidationError(&'static str),
     #[error("external service: {0}")]
     ServiceError(&'static str),
+    #[error("internal: {0}")]
+    Internal(&'static str),
 }
