@@ -5,22 +5,12 @@ use axum::{
     response::Response,
 };
 use jsonwebtoken::{Validation, decode};
-use serde::{Deserialize, Serialize};
 
-use crate::{error::AppError, state::AppState};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Claims {
-    sub: String,
-    role: Role,
-    iss: usize,
-    exp: usize,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-enum Role {
-    Superuser,
-}
+use crate::{
+    auth::jwt::{Claims, Role},
+    error::AppError,
+    state::AppState,
+};
 
 pub async fn jwt_validation(
     State(state): State<AppState>,
