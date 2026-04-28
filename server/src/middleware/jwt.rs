@@ -39,7 +39,8 @@ pub async fn jwt_validation(
     let token = decode::<Claims>(token_str, &state.jwt_decode, &Validation::default())
         .map_err(|_| AppError::AuthError)?;
 
-    println!("{:?}", token);
-
-    Ok(next.run(req).await)
+    match token.claims.role {
+        Role::Superuser => Ok(next.run(req).await),
+        _ => Err(AppError::AuthError),
+    }
 }
