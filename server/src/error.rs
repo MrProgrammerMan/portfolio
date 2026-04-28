@@ -10,8 +10,14 @@ pub enum AppError {
     SessionError(#[from] session::Error),
     #[error("authorization error: {0}")]
     AuthError(#[from] AuthError),
-    #[error("bad request")]
-    BadRequest,
+    #[error("bad request: {0}")]
+    BadRequest(#[from] RequestError),
+}
+
+#[derive(Error, Debug)]
+pub enum RequestError {
+    #[error("Missing session: {0}")]
+    MissingSession(&'static str),
 }
 
 impl IntoResponse for AppError {
@@ -19,7 +25,7 @@ impl IntoResponse for AppError {
         let body = match self {
             Self::SessionError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Session storage failed"),
             Self::AuthError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Authorization failed"),
-            Self::BadRequest => (StatusCode::BAD_REQUEST, "Bad request"),
+            Self::BadRequest(_) => (StatusCode::BAD_REQUEST, "Bad request"),
         };
 
         body.into_response()
