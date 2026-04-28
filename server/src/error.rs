@@ -8,17 +8,20 @@ use crate::auth::error::AuthError;
 pub enum AppError {
     #[error("session storage failed: {0}")]
     SessionError(#[from] session::Error),
-    #[error("authorization error")]
+    #[error("authorization error: {0}")]
     AuthError(#[from] AuthError),
+    #[error("bad request")]
+    BadRequest,
 }
 
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         let body = match self {
-            Self::SessionError(_) => "Session storage failed",
-            Self::AuthError(_) => "Authorization failed",
+            Self::SessionError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Session storage failed"),
+            Self::AuthError(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Authorization failed"),
+            Self::BadRequest => (StatusCode::BAD_REQUEST, "Bad request"),
         };
 
-        (StatusCode::INTERNAL_SERVER_ERROR, body).into_response()
+        body.into_response()
     }
 }
