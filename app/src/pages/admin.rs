@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+#[allow(unused)]
 use leptos_router::{
     MatchNestedRoutes,
     any_nested_route::IntoAnyNestedRoute,

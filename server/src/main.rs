@@ -1,20 +1,23 @@
-use crate::auth::auth_login_handler;
+use crate::{
+    auth::oidc::{auth_callback_handler, auth_login_handler},
+    middleware::jwt::jwt_validation,
+};
+use app::{App, shell};
+use axum::middleware::from_fn_with_state;
+use axum::{Router, routing::get};
+use leptos::logging::log;
+use leptos::prelude::*;
+use leptos_axum::{LeptosRoutes, generate_route_list};
+use state::AppState;
+use tower_sessions::{MemoryStore, SessionManagerLayer};
 
 pub mod auth;
 pub mod error;
+pub mod middleware;
 pub mod state;
 
 #[tokio::main]
 async fn main() {
-    use app::{App, shell};
-    use auth::auth_callback_handler;
-    use axum::{Router, routing::get};
-    use leptos::logging::log;
-    use leptos::prelude::*;
-    use leptos_axum::{LeptosRoutes, generate_route_list};
-    use state::AppState;
-    use tower_sessions::{MemoryStore, SessionManagerLayer};
-
     dotenvy::dotenv().ok();
 
     let conf = get_configuration(None).unwrap();
@@ -22,7 +25,10 @@ async fn main() {
     let leptos_options = conf.leptos_options;
     let state = AppState::new(leptos_options).await;
     // Generate the list of routes in your Leptos App
-    let routes = generate_route_list(App);
+    let (admin_routes, public_routes): (Vec<_>, Vec<_>) = generate_route_list(App)
+        .iter()
+        .cloned()
+        .partition(|i| i.path().starts_with("/admin"));
 
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store)
@@ -30,9 +36,14 @@ async fn main() {
         .with_same_site(leptos_use::SameSite::Lax);
 
     let app = Router::new()
+        .leptos_routes(&state, admin_routes, {
+            let leptos_options = state.leptos_options.clone();
+            move || shell(leptos_options.clone())
+        })
+        .layer(from_fn_with_state(state.clone(), jwt_validation)) // Affects all above it. Should be cheap to clone with internally Arc'ed fields.
         .route("/auth/login", get(auth_login_handler))
         .route("/auth/callback", get(auth_callback_handler))
-        .leptos_routes(&state, routes, {
+        .leptos_routes(&state, public_routes, {
             let leptos_options = state.leptos_options.clone();
             move || shell(leptos_options.clone())
         })
