@@ -26,6 +26,8 @@ dotenvy = { version = "0.15.7" }
 tower-sessions = { version = "0.15.0" }
 thiserror = { version = "2.0.18" }
 jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
+rand = { version = "0.10.1" }
+blake3 = { version = "1.8.5" }
 
 [[workspace.metadata.leptos]]
 name = "portfolio"

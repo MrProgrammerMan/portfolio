@@ -18,3 +18,6 @@ serde = { workspace = true }
 openidconnect = { workspace = true }
 thiserror = { workspace = true }
 jsonwebtoken = { workspace = true }
+rand = { workspace = true }
+blake3 = { workspace = true }
+axum-extra = { workspace = true }
