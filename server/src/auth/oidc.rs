@@ -13,9 +13,7 @@ use tower_sessions::{Session, cookie::time::Duration};
 
 use crate::{
     auth::{
-        error::AuthError,
-        jwt::{self, Role},
-        refresh,
+        cookie::CookieBuilder, error::AuthError, jwt::{self, Role}, refresh
     },
     error::{AppError, RequestError},
     state::AppState,
@@ -142,22 +140,9 @@ pub async fn auth_callback_handler(
         let refresh_token = refresh::generate();
 
         session.insert("refresh", refresh_token.hash).await.unwrap();
-
-        let jwt_cookie = Cookie::build(("jwt", jwt_token))
-            .path("/")
-            .same_site(SameSite::Lax)
-            .http_only(true)
-            .max_age(Duration::minutes(15))
-            .build();
-
-        let refresh_cookie = Cookie::build(("refresh", refresh_token.token))
-            .path("/")
-            .same_site(SameSite::Lax)
-            .http_only(true)
-            .max_age(Duration::days(30))
-            .build();
-
-        let jar = jar.add(jwt_cookie).add(refresh_cookie);
+        let jar = jar
+            .add(CookieBuilder::jwt(jwt_token))
+            .add(CookieBuilder::jwt(refresh_token.token));
 
         return Ok((jar, Redirect::to("/admin")));
     }
