@@ -1,24 +1,26 @@
 use axum::{
-    body::Body,
     extract::{Query, State},
-    http::{Response, StatusCode},
     response::{IntoResponse, Redirect},
 };
+use axum_extra::extract::CookieJar;
+use leptos_use::SameSite;
 use openidconnect::{
     AccessTokenHash, AuthorizationCode, CsrfToken, Nonce, OAuth2TokenResponse, PkceCodeChallenge,
     Scope, TokenResponse, core::CoreAuthenticationFlow,
 };
 use serde::Deserialize;
-use tower_sessions::Session;
+use tower_sessions::{Session, cookie::time::Duration};
 
 use crate::{
     auth::{
         error::AuthError,
         jwt::{self, Role},
+        refresh,
     },
     error::{AppError, RequestError},
     state::AppState,
 };
+use axum_extra::extract::cookie::Cookie;
 
 #[derive(Deserialize)]
 pub struct CallbackParams {
@@ -56,11 +58,12 @@ pub async fn auth_callback_handler(
     Query(params): Query<CallbackParams>,
     State(app_state): State<AppState>,
     session: Session,
+    jar: CookieJar,
 ) -> Result<impl IntoResponse, AppError> {
-    let stored_csrf: String = match session.get("csrf_token").await {
-        Ok(Some(v)) => v,
-        _ => return Err(AppError::BadRequest(RequestError::MissingSession("CSRF"))),
-    };
+    let stored_csrf: String = session
+        .get("csrf_token")
+        .await?
+        .ok_or(AppError::BadRequest(RequestError::MissingSession("CSRF")))?;
 
     if stored_csrf != params.state {
         return Err(AppError::AuthError(AuthError::ValidationError(
@@ -68,13 +71,13 @@ pub async fn auth_callback_handler(
         )));
     }
 
-    let pkce_verifier = match session.get("pkce_verifier").await {
-        Ok(Some(v)) => v,
-        _ => return Err(AppError::BadRequest(RequestError::MissingSession("PKCE"))),
+    let pkce_verifier = match session.get("pkce_verifier").await? {
+        Some(v) => v,
+        None => return Err(AppError::BadRequest(RequestError::MissingSession("PKCE"))),
     };
-    let nonce = match session.get::<Nonce>("nonce").await {
-        Ok(Some(v)) => v,
-        _ => return Err(AppError::BadRequest(RequestError::MissingSession("Nonce"))),
+    let nonce = match session.get::<Nonce>("nonce").await? {
+        Some(v) => v,
+        None => return Err(AppError::BadRequest(RequestError::MissingSession("Nonce"))),
     };
 
     let token_response = match app_state
@@ -133,31 +136,30 @@ pub async fn auth_callback_handler(
     if let Some(email) = claims.email().map(|email| email.as_str())
         && email == "jonas.baugerud@gmail.com"
     {
-        let token = jwt::generate(&app_state.jwt_encode, Role::Superuser, email.to_string())
+        let jwt_token = jwt::generate(&app_state.jwt_encode, Role::Superuser, email.to_string())
             .map_err(|e| AppError::AuthError(AuthError::JWTError(e)))?;
 
-        let html = format!(
-            r#"<!DOCTYPE html>
-            <html>
-            <head>
-                <meta http-equiv="refresh" content="0;url=/admin">
-                <script>window.location.href = "/admin";</script>
-            </head>
-            <body>Redirecting...</body>
-            </html>"#
-        );
+        let refresh_token = refresh::generate();
 
-        let res = Response::builder()
-            .status(StatusCode::SEE_OTHER)
-            .header(
-                "Set-Cookie",
-                format!("token={}; HttpOnly; Secure; SameSite=Strict; Path=/", token),
-            )
-            .header("Content-Type", "text/html")
-            .body(Body::from(html))
-            .map_err(|_| AppError::AuthError(AuthError::Internal("Failed to build response")))?;
+        session.insert("refresh", refresh_token.hash).await.unwrap();
 
-        return Ok(res);
+        let jwt_cookie = Cookie::build(("jwt", jwt_token))
+            .path("/")
+            .same_site(SameSite::Lax)
+            .http_only(true)
+            .max_age(Duration::minutes(15))
+            .build();
+
+        let refresh_cookie = Cookie::build(("refresh", refresh_token.token))
+            .path("/")
+            .same_site(SameSite::Lax)
+            .http_only(true)
+            .max_age(Duration::days(30))
+            .build();
+
+        let jar = jar.add(jwt_cookie).add(refresh_cookie);
+
+        return Ok((jar, Redirect::to("/admin")));
     }
 
     Err(AppError::AuthError(AuthError::Unauthorized))
