@@ -7,8 +7,10 @@ Work in progress — building this out piece by piece. It'll be something eventu
 | Feature | Status |
 |---|---|
 | Google OIDC via [`openidconnect`](https://crates.io/crates/openidconnect) | ✅ Done |
+| JSON web token generation via [`jsonwebtoken`](https://crates.io/crates/jsonwebtoken) | ✅ Done |
+| Refresh tokens in-memory for seemless reauth | ⬜ Planned |
 | Postgres connection via [`sqlx`](https://crates.io/crates/sqlx) | ⬜ Planned |
-| [`JWT`](https://crates.io/crates/jwt) auth + refresh tokens in Postgres | ⬜ Planned |
+| refresh tokens moved to Postgres | ⬜ Planned |
 | Admin pages *(hopefully you'll never see these 👀)* | ⬜ Planned |
 | Projects page | ⬜ Planned |
 | Dynamic image storage via [MinIO](https://crates.io/crates/aws-sdk-s3) | ⬜ Planned |
