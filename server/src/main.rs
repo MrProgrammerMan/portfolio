@@ -1,5 +1,8 @@
 use crate::{
-    auth::oidc::{auth_callback_handler, auth_login_handler},
+    auth::{
+        oidc::{auth_callback_handler, auth_login_handler},
+        refresh::refresh_handler,
+    },
     middleware::jwt::jwt_validation,
 };
 use app::{App, shell};
@@ -43,6 +46,7 @@ async fn main() {
         .layer(from_fn_with_state(state.clone(), jwt_validation)) // Affects all above it. Should be cheap to clone with internally Arc'ed fields.
         .route("/auth/login", get(auth_login_handler))
         .route("/auth/callback", get(auth_callback_handler))
+        .route("/refresh", get(refresh_handler))
         .leptos_routes(&state, public_routes, {
             let leptos_options = state.leptos_options.clone();
             move || shell(leptos_options.clone())
