@@ -27,7 +27,6 @@ async fn main() {
     let addr = conf.leptos_options.site_addr;
     let leptos_options = conf.leptos_options;
     let state = AppState::new(leptos_options).await;
-    // Generate the list of routes in your Leptos App
     let (admin_routes, public_routes): (Vec<_>, Vec<_>) = generate_route_list(App)
         .iter()
         .cloned()
