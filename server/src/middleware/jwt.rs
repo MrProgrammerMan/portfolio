@@ -31,7 +31,7 @@ pub async fn jwt_validation(
     let token = match token_result {
         Ok(token) => token,
         Err(e) => match e.kind() {
-            jwtErrorKind::ExpiredSignature => return Ok(Redirect::to("/refresh").into_response()),
+            jwtErrorKind::ExpiredSignature => return Ok(Redirect::to("/auth/refresh").into_response()),
             _ => return Err(AppError::AuthError(AuthError::JWTError(e))),
         },
     };
